@@ -25,8 +25,8 @@ class Gdbdump
 
     def run
       @stdin, @stdout, @stderr = Open3.popen3(*@exec_options)
-      if get_response =~ /ptrace: Operation not permitted./
-        raise 'Must run gdbdump with sudo'
+      if get_response =~ /ptrace: Operation not permitted/
+        raise 'root privilege is required'
       end
       prepare
       begin
