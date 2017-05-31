@@ -10,8 +10,9 @@ $ gem install gdbdump
 
 ## Requirements
 
-* run with sudo.
-* on Linux.
+* gdb
+* linux
+* root privilege (gdb requires)
 
 It was verfied that gdbdump works with ruby executables built by [rbenv/ruby-build](https://github.com/rbenv/ruby-build).
 
