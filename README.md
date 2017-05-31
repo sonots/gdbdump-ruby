@@ -1,4 +1,4 @@
-# Gdbdump
+# gdbdump
 
 Print C level and Ruby level backtrace of living ruby process using gdb
 
