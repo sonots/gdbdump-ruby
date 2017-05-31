@@ -10,7 +10,7 @@ class Gdbdump
       begin
         File.readlink("/proc/#{@pid}/exe")
       rescue Errno::ENOENT
-        raise "/proc/#{@pid}/exe does not exist, it seems pid #{@pid} does not exit"
+        raise "/proc/#{@pid}/exe does not exist, it seems no process of pid #{@pid} exists"
       end
     end
   end
