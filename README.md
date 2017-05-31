@@ -1,18 +1,25 @@
 # Gdbdump
 
-Print C level and Ruby level backtrace of living process using gdb
+Print C level and Ruby level backtrace of living ruby process using gdb
 
 ## Installation
 
-    $ gem install gdbdump
+```
+$ gem install gdbdump
+```
 
 ## Requirements
 
-* Must run with sudo.
-* Ruby executable must have debug symbol.
+* run with sudo.
 * on Linux.
 
+It was verfied that gdbdump works with ruby executables built by [rbenv/ruby-build](https://github.com/rbenv/ruby-build).
+
 ## Usage
+
+```
+gdbdump [pid|prog pid]
+```
 
 ## Example
 
@@ -39,11 +46,24 @@ You will see C and Ruby level backtrace on STDERR of **the target process** of p
 
 Attach to the ruby process with gdb, and call `rb_print_backtrace()` (C level backtrace) and `rb_backtrace()` (Ruby level backtrace). That's it.
 
+The path of ruby executable is automatically retrived from `/proc/[PID]/exe` as default.
+
 ## ToDo
 
 * Want to print backtrace on STDOUT of gdbdump process.
-  * To do it, we need another version of `rb_print_backtrace` and `rb_backtrace` to print results into a file in CRuby itself.
+  * To do it, we need another version of `rb_print_backtrace` and `rb_backtrace` to write results into a file in CRuby.
   * If they are available, gdbdump can dump to a file and, then read and print into STDOUT of gdbdump process.
+
+## Comparisons
+
+* gdb
+  * You can print C level backtrace with raw gdb, of course
+* [sigdump](https://github.com/frsyuki/sigdump)
+  * sigdump enables to print ruby level backtrace with sending CONT signal to living ruby process.
+  * The ruby process must pre-install `sigdump` gem and `require 'sigdump/setup'` unlike gdbdump.
+* [gdbruby](https://github.com/gunyarakun/gdbruby)
+  * gdbruby enables to print C level and ruby level backtrace of living ruby process and core file.
+  * gdbruby must follow changes of C level interfaces of CRuby to get backtrace of the core file, it rises fragility that it will be broken on newer ruby versions.
 
 ## Development
 
