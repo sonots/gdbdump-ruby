@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/gdbdump/cli'
+Gdbdump::CLI.new.run

@@ -1,28 +1,49 @@
 # Gdbdump
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/gdbdump`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Print C level and Ruby level backtrace of living process using gdb
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'gdbdump'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
     $ gem install gdbdump
+
+## Requirements
+
+* Must run with sudo.
+* Ruby executable must have debug symbol.
+* on Linux.
 
 ## Usage
 
-TODO: Write usage instructions here
+## Example
+
+With living ruby process of pid 1897,
+
+```
+$ sudo gdbdump 1897
+```
+
+You will see C and Ruby level backtrace on STDERR of **the target process** of pid 1897 as:
+
+```
+== c backtrace ==
+/home/ubuntu/.rbenv/versions/2.4.1/bin/ruby(rb_print_backtrace+0x15) [0x7fd23062c115] vm_dump.c:684
+[0x7ffc98c378af]
+== ruby backtrace ==
+        from loop.rb:3:in `<main>'
+        from loop.rb:3:in `loop'
+        from loop.rb:5:in `block in <main>'
+        from loop.rb:5:in `sleep'
+```
+
+## How this work
+
+Attach to the ruby process with gdb, and call `rb_print_backtrace()` (C level backtrace) and `rb_backtrace()` (Ruby level backtrace). That's it.
+
+## ToDo
+
+* Want to print backtrace on STDOUT of gdbdump process.
+  * To do it, we need another version of `rb_print_backtrace` and `rb_backtrace` to print results into a file in CRuby itself.
+  * If they are available, gdbdump can dump to a file and, then read and print into STDOUT of gdbdump process.
 
 ## Development
 
@@ -32,7 +53,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gdbdump. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/sonots/gdbdump. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

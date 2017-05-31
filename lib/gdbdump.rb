@@ -1,5 +1,3 @@
-require "gdbdump/version"
-
-module Gdbdump
-  # Your code goes here...
-end
+require_relative "gdbdump/version"
+require_relative "gdbdump/gdb"
+require_relative "gdbdump/procfs"
