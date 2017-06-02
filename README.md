@@ -64,11 +64,10 @@ loop.rb:11:in `block in <main>'
 
 ## FAQ
 
-Q. How this work?
-A. Attach to the ruby process with gdb, and call `rb_ps` defined in gdbinit. That's it.
-
-Q. Is this available for production process?
-A. GDB stops the process during printing backtrace, would cause some issues
+* Q. How this work?
+  * A. Attach to the ruby process with gdb, and call `rb_ps` defined in gdbinit. That's it.
+* Q. Is this available for production process?
+  * A. GDB stops the process during printing backtrace, would cause some issues
 
 ## Comparisons
 
@@ -77,9 +76,11 @@ A. GDB stops the process during printing backtrace, would cause some issues
 * [sigdump](https://github.com/frsyuki/sigdump)
   * sigdump enables to print ruby level backtrace with sending CONT signal to living ruby process.
   * The ruby process must pre-install `sigdump` gem and `require 'sigdump/setup'` unlike gdbdump.
+  * sigdump prints backtrace in signal handler, so blocks main thread, but other threads still work unlike gdbdump.
 * [gdbruby](https://github.com/gunyarakun/gdbruby)
   * gdbruby enables to print C level and ruby level backtrace of living ruby process and core file.
   * gdbruby must follow changes of C level interfaces of CRuby to get backtrace of the core file, it rises fragility that it will be broken on newer ruby versions.
+  * gdbruby stops the process during printing backtrace as gdbdump, but it supports also core file. Using `gcore` command to get core file, it would be possible to analyze without stopping the process.
 
 ## Development
 
