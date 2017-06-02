@@ -19,10 +19,11 @@ It was verfied that gdbdump works with ruby executables built by [rbenv/ruby-bui
 ## Usage
 
 ```
-Usage: gdbdump [options] [pid|prog pid]
-    -d, --[no-]debug   print debug log (default: false)
-    -x, --gdbinit FILE path to ruby trunk's .gdbinit (default: some of ruby trunk's .gdbinit is bundle in this gem, and used})
-        --gdb PATH     path to gdb command (default: gdb)
+Usage: gdbdump [options] pid
+    -d, --[no-]debug                 print debug log (default: false)
+    -x, --gdbinit FILE               path to ruby trunk's .gdbinit (default: some of ruby trunk's .gdbinit is pre-bundle in this gem)
+        --gdb PATH                   path to gdb command (default: gdb)
+        --ruby PATH                  path to ruby which the attached process uses (default: get from /proc/[PID]/exe)
 ```
 
 ### .gdbinit

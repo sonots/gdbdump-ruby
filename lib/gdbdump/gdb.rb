@@ -2,7 +2,7 @@
 require 'open3'
 
 class Gdbdump
-  # GDB.new(pid: 999, prog: '/path/to/ruby', debug: true).run do |gdb|
+  # GDB.new(pid: 999, debug: true).run do |gdb|
   #   puts gdb.cmd_exec('bt')
   # end
   class GDB
@@ -10,13 +10,13 @@ class Gdbdump
     STRINGS_CMD = 'strings'
     SUDO_CMD = 'sudo'
 
-    def initialize(pid:, prog: nil, debug: false, gdbinit: nil, gdb: nil)
+    def initialize(pid:, debug: false, gdbinit: nil, gdb: nil, ruby: nil)
       @pid = pid.to_s
-      @prog = prog
       @debug = debug
-      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_version, 'gdbinit')
       @gdb = gdb || 'gdb'
-      @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @prog, @pid]
+      @ruby = ruby || Procfs.new(@pid).exe
+      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_version, 'gdbinit')
+      @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @ruby, @pid]
     end
 
     def print_backtrace
@@ -54,7 +54,7 @@ class Gdbdump
     # NOTE: I want ruby_version before starting gdb
     def ruby_version
       return @ruby_version if @ruby_version
-      ret = `#{STRINGS_CMD} #{@prog}`
+      ret = `#{STRINGS_CMD} #{@ruby}`
       line = ret.lines.find {|_| _.start_with?('RUBY_VERSION "') }
       @ruby_version = line[14..-3] if line
     end
