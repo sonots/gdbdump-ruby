@@ -13,8 +13,12 @@ class Gdbdump
       @pid = pid.to_s
       @debug = debug
       @gdb = gdb || 'gdb'
-      @ruby = ruby || Procfs.new(@pid).exe
-      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_minor_version, 'gdbinit')
+      @ruby = (ruby || Procfs.new(@pid).exe).tap do |path|
+        raise "ruby #{path} is not accessible" unless File.executable?(path)
+      end
+      @gdbinit = (gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_minor_version, 'gdbinit')).tap do |path|
+        raise "gdbinit #{path} is not readable" unless File.readable?(path)
+      end
       @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @ruby, @pid]
     end
 
