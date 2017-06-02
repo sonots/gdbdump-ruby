@@ -14,9 +14,16 @@ class Gdbdump
       @debug = debug
       @gdb = gdb || 'gdb'
       @ruby = ruby || Procfs.new(@pid).exe
-      @ruby_version = `#{@ruby} -e 'puts RUBY_VERSION'`.chomp
-      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', @ruby_version, 'gdbinit')
+      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_minor_version, 'gdbinit')
       @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @ruby, @pid]
+    end
+
+    private def ruby_version
+      `#{@ruby} -e 'puts RUBY_VERSION'`.chomp
+    end
+
+    private def ruby_minor_version
+      ruby_version.split('.')[0,2].join('.')
     end
 
     def print_backtrace
