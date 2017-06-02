@@ -19,12 +19,25 @@ It was verfied that gdbdump works with ruby executables built by [rbenv/ruby-bui
 ## Usage
 
 ```
-gdbdump [pid|prog pid]
+Usage: gdbdump [options] [pid|prog pid]
+    -d, --[no-]debug   print debug log (default: false)
+    -x, --gdbinit FILE path to ruby trunk's .gdbinit (default: some of ruby trunk's .gdbinit is bundle in this gem, and used})
+        --gdb PATH     path to gdb command (default: gdb)
 ```
+
+### .gdbinit
+
+Current default supported ruby versions: 2.3.0 - 2.4.1
+
+Ruby trunk's .gdbinit file defines useful helper functions and it is maintained by ruby core team. `gdbdump` uses it.
+Some versions of .gdbinit are bundled in this gem, but if you want to use `gdbdump` for older or newer ruby versions:
+
+1. Download .gdbinit from ruby repo like https://github.com/ruby/ruby/blob/v2_4_1/.gdbinit, and specify with `-x` option
+2. Or, send PR to bundle the .gdbinit in `gdbdump` gem.
 
 ## Example
 
-With living ruby process of pid 1897,
+With living ruby 2.4.1 process of pid 1897,
 
 ```
 $ sudo gdbdump 1897
@@ -33,27 +46,29 @@ $ sudo gdbdump 1897
 You will see C and Ruby level backtrace on STDERR of **the target process** of pid 1897 as:
 
 ```
-== c backtrace ==
-/home/ubuntu/.rbenv/versions/2.4.1/bin/ruby(rb_print_backtrace+0x15) [0x7fd23062c115] vm_dump.c:684
-[0x7ffc98c378af]
-== ruby backtrace ==
-        from loop.rb:3:in `<main>'
-        from loop.rb:3:in `loop'
-        from loop.rb:5:in `block in <main>'
-        from loop.rb:5:in `sleep'
+$1 = (rb_vm_t *) 0x7f46bb071f20
+* #<Thread:0x7f46bb0a5ee8 rb_thread_t:0x7f46bb0725d0 native_thread:0x7f46ba514740>
+0x7f46ba16d700 <thread_join_m at thread.c:980>:in `join'
+loop.rb:17:in `<main>'
+* #<Thread:0x7f46bb202750 rb_thread_t:0x7f46bb3e03d0 native_thread:0x7f46b89c0700>
+0x7f46ba0e4f30 <rb_f_sleep at process.c:4388>:in `sleep'
+loop.rb:6:in `block (2 levels) in <main>'
+0x7f46ba1a72b0 <rb_f_loop at vm_eval.c:1137>:in `loop'
+loop.rb:4:in `block in <main>'
+* #<Thread:0x7f46bb202660 rb_thread_t:0x7f46bb3e47e0 native_thread:0x7f46b87be700>
+0x7f46ba0e4f30 <rb_f_sleep at process.c:4388>:in `sleep'
+loop.rb:13:in `block (2 levels) in <main>'
+0x7f46ba1a72b0 <rb_f_loop at vm_eval.c:1137>:in `loop'
+loop.rb:11:in `block in <main>'
 ```
 
-## How this work
+## FAQ
 
-Attach to the ruby process with gdb, and call `rb_print_backtrace()` (C level backtrace) and `rb_backtrace()` (Ruby level backtrace). That's it.
+Q. How this work?
+A. Attach to the ruby process with gdb, and call `rb_ps` defined in gdbinit. That's it.
 
-The path of ruby executable is automatically retrived from `/proc/[PID]/exe` as default.
-
-## ToDo
-
-* Want to print backtrace on STDOUT of gdbdump process.
-  * To do it, we need another version of `rb_print_backtrace` and `rb_backtrace` to write results into a file in CRuby.
-  * If they are available, gdbdump can dump to a file and, then read and print into STDOUT of gdbdump process.
+Q. Is this available for production process?
+A. GDB stops the process during printing backtrace, would cause some issues
 
 ## Comparisons
 
