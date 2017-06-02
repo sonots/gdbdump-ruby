@@ -1,3 +1,4 @@
+# frozen-string-literal: true
 require 'open3'
 
 class Gdbdump
@@ -6,21 +7,29 @@ class Gdbdump
   # end
   class GDB
     COMMAND_READ_BUFFER_SIZE = 1024
+    STRINGS_CMD = 'strings'
 
-    def initialize(pid:, prog:, debug: false)
-      @prog = prog
+    def initialize(pid:, prog: nil, debug: false, gdbinit: nil, gdb: nil)
       @pid = pid.to_s
+      @prog = prog
       @debug = debug
-      @exec_options = ['gdb', '-silent', '-nw', @prog, @pid]
+      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_version, 'gdbinit')
+      @gdb = gdb || 'gdb'
+      @exec_options = [@gdb, '-silent', '-nw', '-x', @gdbinit, @prog, @pid]
     end
 
     def print_backtrace
       run do |gdb|
-        gdb.cmd_exec('call write(2, "== c backtrace ==\n", 18)')
-        gdb.cmd_exec('call rb_print_backtrace()')
-        gdb.cmd_exec('call write(2, "== ruby backtrace ==\n", 21)')
-        gdb.cmd_exec('call rb_backtrace()')
+        out, err = gdb.cmd_exec('rb_ps')
+        $stdout.puts out
+        $stderr.puts err unless err.empty?
       end
+      # run do |gdb|
+      #   gdb.cmd_exec('call write(2, "== c backtrace ==\n", 18)')
+      #   gdb.cmd_exec('call rb_print_backtrace()')
+      #   gdb.cmd_exec('call write(2, "== ruby backtrace ==\n", 21)')
+      #   gdb.cmd_exec('call rb_backtrace()')
+      # end
     end
 
     def run
@@ -40,6 +49,15 @@ class Gdbdump
       end
     end
 
+    # ToDo: Any faster way to get ruby_version from pid?
+    # NOTE: I want ruby_version before starting gdb
+    def ruby_version
+      return @ruby_version if @ruby_version
+      ret = `#{STRINGS_CMD} #{@prog}`
+      line = ret.lines.find {|_| _.start_with?('RUBY_VERSION "') }
+      @ruby_version = line[14..-3] if line
+    end
+
     def cmd_exec(cmd)
       log('C', cmd)
       if cmd
@@ -52,18 +70,19 @@ class Gdbdump
     end
 
     def get_response
-      response = +''
-
+      out = +''
       loop do
         begin
           buf = @stdout.sysread(COMMAND_READ_BUFFER_SIZE)
         rescue EOFError
           break
         end
-        response << buf
         break if buf =~ /\(gdb\) $/
+        out << buf
       end
+      log('O', out)
 
+      err = +''
       loop do
         begin
           buf = @stderr.read_nonblock(COMMAND_READ_BUFFER_SIZE)
@@ -72,17 +91,16 @@ class Gdbdump
         rescue EOFError
           break
         end
-        response << buf if buf
+        err << buf if buf
       end
+      log('E', err)
 
-      log('R', response)
-      response
+      [out, err]
     end
 
     private
 
     def prepare
-      cmd_exec('')
       cmd_exec('set pagination off')
     end
 
@@ -93,6 +111,7 @@ class Gdbdump
 
     def log(pre, message)
       return unless @debug
+      return if message.nil? or message.empty?
       message.each_line do |line|
         puts "#{pre}: #{line}"
       end

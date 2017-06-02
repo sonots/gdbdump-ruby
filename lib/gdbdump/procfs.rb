@@ -8,7 +8,7 @@ class Gdbdump
 
     def exe
       begin
-        File.readlink("/proc/#{@pid}/exe")
+        @exe ||= File.readlink("/proc/#{@pid}/exe")
       rescue Errno::ENOENT
         raise "/proc/#{@pid}/exe does not exist, it seems no process of pid #{@pid} exists"
       end
