@@ -1,3 +1,13 @@
+# 0.9.1
+
+Enhancements:
+
+* Get ruby version from `ruby -e 'puts RUBY_VERSION'` instead of `strings ruby | grep RUBY_VERSION` so that I do not need to assume `strings` command is available
+
+Changes:
+
+* Add `--ruby` option instead of `[prog pid]` argument style.
+
 # 0.9.0
 
 Enhancements:
