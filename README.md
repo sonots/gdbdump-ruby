@@ -27,9 +27,9 @@ Usage: gdbdump [options] [pid|prog pid]
 
 ### .gdbinit
 
-Current default supported ruby versions: 2.3.0 - 2.4.1
+Default supported ruby versions: 2.3.0 - 2.4.1
 
-Ruby trunk's .gdbinit file defines useful helper functions and it is maintained by ruby core team. `gdbdump` uses it.
+Ruby trunk's [.gdbinit](https://github.com/ruby/ruby/blob/trunk/.gdbinit) file defines useful helper functions and it is maintained by ruby core team. `gdbdump` uses it.
 Some versions of .gdbinit are bundled in this gem, but if you want to use `gdbdump` for older or newer ruby versions:
 
 1. Download .gdbinit from ruby repo like https://github.com/ruby/ruby/blob/v2_4_1/.gdbinit, and specify with `-x` option
