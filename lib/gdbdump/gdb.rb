@@ -7,7 +7,6 @@ class Gdbdump
   # end
   class GDB
     COMMAND_READ_BUFFER_SIZE = 1024
-    STRINGS_CMD = 'strings'
     SUDO_CMD = 'sudo'
 
     def initialize(pid:, debug: false, gdbinit: nil, gdb: nil, ruby: nil)
@@ -15,7 +14,8 @@ class Gdbdump
       @debug = debug
       @gdb = gdb || 'gdb'
       @ruby = ruby || Procfs.new(@pid).exe
-      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_version, 'gdbinit')
+      @ruby_version = `#{@ruby} -e 'puts RUBY_VERSION'`.chomp
+      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', @ruby_version, 'gdbinit')
       @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @ruby, @pid]
     end
 
@@ -48,15 +48,6 @@ class Gdbdump
         @stdout.close
         @stderr.close
       end
-    end
-
-    # ToDo: Any faster way to get ruby_version from pid?
-    # NOTE: I want ruby_version before starting gdb
-    def ruby_version
-      return @ruby_version if @ruby_version
-      ret = `#{STRINGS_CMD} #{@ruby}`
-      line = ret.lines.find {|_| _.start_with?('RUBY_VERSION "') }
-      @ruby_version = line[14..-3] if line
     end
 
     def cmd_exec(cmd)
