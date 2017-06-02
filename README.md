@@ -12,7 +12,7 @@ $ gem install gdbdump
 
 * gdb
 * linux
-* root privilege (gdb requires)
+* `sudo gdb` must be allowed
 
 It was verfied that gdbdump works with ruby executables built by [rbenv/ruby-build](https://github.com/rbenv/ruby-build).
 
@@ -40,7 +40,7 @@ Some versions of .gdbinit are bundled in this gem, but if you want to use `gdbdu
 With living ruby 2.4.1 process of pid 1897,
 
 ```
-$ sudo gdbdump 1897
+$ gdbdump 1897
 ```
 
 You will see C and Ruby level backtrace on STDERR of **the target process** of pid 1897 as:

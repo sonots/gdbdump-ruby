@@ -8,6 +8,7 @@ class Gdbdump
   class GDB
     COMMAND_READ_BUFFER_SIZE = 1024
     STRINGS_CMD = 'strings'
+    SUDO_CMD = 'sudo'
 
     def initialize(pid:, prog: nil, debug: false, gdbinit: nil, gdb: nil)
       @pid = pid.to_s
@@ -15,7 +16,7 @@ class Gdbdump
       @debug = debug
       @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_version, 'gdbinit')
       @gdb = gdb || 'gdb'
-      @exec_options = [@gdb, '-silent', '-nw', '-x', @gdbinit, @prog, @pid]
+      @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @prog, @pid]
     end
 
     def print_backtrace
