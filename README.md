@@ -43,7 +43,7 @@ With living ruby 2.4.1 process of pid 1897,
 $ gdbdump 1897
 ```
 
-You will see C and Ruby level backtrace on STDERR of **the target process** of pid 1897 as:
+You will see C and Ruby level backtrace as:
 
 ```
 $1 = (rb_vm_t *) 0x7f46bb071f20
