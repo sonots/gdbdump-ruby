@@ -16,10 +16,18 @@ class Gdbdump
 
       opts = {
         debug: false,
+        gdbinit: nil,
+        gdb: nil,
       }
 
       op.on('-d', '--[no-]debug', "print debug log (default: #{opts[:debug]})") {|v|
         opts[:debug] = v
+      }
+      op.on('-x', '--gdbinit FILE', "path to ruby trunk's .gdbinit (default: some of ruby trunk's .gdbinit is bundle in this gem, and used})") {|v|
+        opts[:gdbinit] = v
+      }
+      op.on('--gdb PATH', "path to gdb command (default: gdb)") {|v|
+        opts[:gdb] = v
       }
 
       op.banner += ' [pid|prog pid]'
@@ -43,7 +51,7 @@ class Gdbdump
 
     def run
       parse_options
-      GDB.new(pid: @pid, prog: @prog, debug: @opts[:debug]).print_backtrace
+      GDB.new(pid: @pid, prog: @prog, **(@opts)).print_backtrace
     end
   end
 end
