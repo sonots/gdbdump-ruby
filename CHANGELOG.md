@@ -1,3 +1,9 @@
+# 0.9.2
+
+Enhancements:
+
+* Add gdbinit of ruby 2.1 and 2.2
+
 # 0.9.1
 
 Enhancements:
