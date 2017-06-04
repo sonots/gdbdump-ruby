@@ -24,7 +24,7 @@ class Gdbdump
       op.on('-d', '--[no-]debug', "print debug log (default: #{opts[:debug]})") {|v|
         opts[:debug] = v
       }
-      op.on('-x', '--gdbinit FILE', "path to ruby trunk's .gdbinit (default: some of ruby trunk's .gdbinit is pre-bundle in this gem)") {|v|
+      op.on('-x', '--gdbinit FILE', "path to ruby repo's .gdbinit (default: some of ruby repo's .gdbinit are pre-bundle in this gem)") {|v|
         opts[:gdbinit] = v
       }
       op.on('--gdb PATH', "path to gdb command (default: gdb)") {|v|
