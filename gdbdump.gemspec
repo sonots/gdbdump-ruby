@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Naotoshi Seo"]
   spec.email         = ["sonots@gmail.com"]
 
-  spec.summary       = %q{Print C level and Ruby level backtrace of living process using gdb.}
-  spec.description   = %q{Print C level and Ruby level backtrace of living process using gdb.}
+  spec.summary       = %q{Dump C level and Ruby level backtrace of living process using gdb.}
+  spec.description   = %q{Dump C level and Ruby level backtrace of living process using gdb.}
   spec.homepage      = "https://github.com/sonots/gdbdump-ruby"
   spec.license       = "MIT"
 
