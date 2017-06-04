@@ -1,3 +1,9 @@
+# 0.9.3
+
+Enhancements:
+
+* Trivial enhancements of error messages
+
 # 0.9.2
 
 Enhancements:
