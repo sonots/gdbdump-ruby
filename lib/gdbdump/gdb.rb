@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 require 'open3'
+require 'securerandom'
+require 'shellwords'
 
 class Gdbdump
   # GDB.new(pid: 999, debug: true).run do |gdb|
@@ -30,7 +32,7 @@ class Gdbdump
       ruby_version.split('.')[0,2].join('.')
     end
 
-    def print_backtrace
+    def print_rb_ps
       run do |gdb|
         out, err = gdb.cmd_exec('rb_ps')
         $stdout.puts out
@@ -42,6 +44,32 @@ class Gdbdump
       #   gdb.cmd_exec('call write(2, "== ruby backtrace ==\n", 21)')
       #   gdb.cmd_exec('call rb_backtrace()')
       # end
+    end
+
+    def print_backtrace
+
+    def dumpfile
+      "/tmp/gdbdump-#{@pid}"
+    end
+
+    def print_ruby_backtrace
+      run do |gdb|
+        out, err = gdb.cmd_exec(%Q[call rb_eval_string("#{ruby_backtrace_code}")])
+        $stderr.puts err unless err.empty?
+      end
+    end
+
+    def ruby_backtrace_code
+      code = +%Q[File.open('#{dumpfile}', 'a') {|f|]
+      code << %q[
+  Thread.list.each {|th|
+    f.write %Q[  Thread #{th} status=#{th.status} priority=#{th.priority}\n]
+    th.backtrace.each {|bt|
+      f.write %Q[      #{bt}\n]
+    }
+  }
+}]
+      code.split("\n").map(&:strip).join('; ')
     end
 
     def run
