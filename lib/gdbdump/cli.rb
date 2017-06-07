@@ -19,6 +19,7 @@ class Gdbdump
         gdbinit: nil,
         gdb: nil,
         ruby: nil,
+        pid_or_core: nil,
       }
 
       op.on('-d', '--[no-]debug', "print debug log (default: #{opts[:debug]})") {|v|
@@ -30,11 +31,8 @@ class Gdbdump
       op.on('--gdb PATH', "path to gdb command (default: gdb)") {|v|
         opts[:gdb] = v
       }
-      op.on('--ruby PATH', "path to ruby which the attached process uses (default: get from /proc/[PID]/exe)") {|v|
-        opts[:ruby] = v
-      }
 
-      op.banner += ' pid'
+      op.banner += ' [ pid | /path/to/ruby pid | /path/to/ruby core ]'
       begin
         args = op.parse(argv)
       rescue OptionParser::InvalidOption => e
@@ -42,9 +40,12 @@ class Gdbdump
       end
 
       if args.size == 1
-        @pid = args.first
+        opts[:pid_or_core] = args[0]
+      elsif args.size == 2
+        opts[:ruby] = args[0]
+        opts[:pid_or_core] = args[1]
       else
-        usage 'number of arguments must be 1'
+        usage 'number of arguments must be 1 or 2'
       end
 
       @opts = opts
@@ -52,7 +53,7 @@ class Gdbdump
 
     def run
       parse_options
-      GDB.new(pid: @pid, **(@opts)).print_backtrace
+      GDB.new(@opts).print_backtrace
     end
   end
 end

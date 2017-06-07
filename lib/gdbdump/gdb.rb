@@ -9,17 +9,27 @@ class Gdbdump
     COMMAND_READ_BUFFER_SIZE = 1024
     SUDO_CMD = 'sudo'
 
-    def initialize(pid:, debug: false, gdbinit: nil, gdb: nil, ruby: nil)
-      @pid = pid.to_s
+    def initialize(ruby: nil, pid_or_core:, debug: false, gdbinit: nil, gdb: nil)
+      if pid_or_core =~ /\A\d+\z/
+        @pid  = pid_or_core.to_s
+        @ruby = ruby || Procfs.new(@pid).exe
+      else
+        @core = pid_or_core
+        raise "core #{@core} is not readable" unless File.readable?(@core)
+        @ruby = ruby || raise("With core file, ruby path is required")
+      end
+      @pid_or_core = pid_or_core
+      raise "ruby #{@ruby} is not accessible" unless File.executable?(@ruby)
+
+      @gdbinit = gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_minor_version, 'gdbinit')
+      raise "gdbinit #{@gdbinit} is not readable" unless File.readable?(@gdbinit)
+
       @debug = debug
       @gdb = gdb || 'gdb'
-      @ruby = (ruby || Procfs.new(@pid).exe).tap do |path|
-        raise "ruby #{path} is not accessible" unless File.executable?(path)
-      end
-      @gdbinit = (gdbinit || File.join(ROOT, 'vendor', 'ruby', ruby_minor_version, 'gdbinit')).tap do |path|
-        raise "gdbinit #{path} is not readable" unless File.readable?(path)
-      end
-      @exec_options = [SUDO_CMD, @gdb, '-silent', '-nw', '-x', @gdbinit, @ruby, @pid]
+
+      @exec_options = [@gdb, '-silent', '-nw', '-x', @gdbinit, @ruby, @pid_or_core]
+      @exec_options.unshift(SUDO_CMD) if @pid # sudo is required to ptrace a living process
+      log('C', @exec_options.join(' '))
     end
 
     private def ruby_version
@@ -36,12 +46,6 @@ class Gdbdump
         $stdout.puts out
         $stderr.puts err unless err.empty?
       end
-      # run do |gdb|
-      #   gdb.cmd_exec('call write(2, "== c backtrace ==\n", 18)')
-      #   gdb.cmd_exec('call rb_print_backtrace()')
-      #   gdb.cmd_exec('call write(2, "== ruby backtrace ==\n", 21)')
-      #   gdb.cmd_exec('call rb_backtrace()')
-      # end
     end
 
     def run
@@ -54,7 +58,7 @@ class Gdbdump
         yield(self)
         detach
       ensure
-        Process.kill('CONT', @pid.to_i)
+        Process.kill('CONT', @pid.to_i) if @pid
         @stdin.close
         @stdout.close
         @stderr.close

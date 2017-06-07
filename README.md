@@ -1,6 +1,6 @@
 # gdbdump
 
-Dump C level and Ruby level backtrace of living ruby process using gdb.
+Dump C level and Ruby level backtrace from living ruby process or core file using gdb.
 
 ## Installation
 
@@ -12,18 +12,17 @@ $ gem install gdbdump
 
 * gdb
 * linux
-* `sudo gdb` must be allowed
+* `sudo gdb` must be allowed to dump backtrace of living ruby process
 
 It was verified that gdbdump works with ruby executables built by [rbenv/ruby-build](https://github.com/rbenv/ruby-build).
 
 ## Usage
 
 ```
-Usage: gdbdump [options] pid
+Usage: gdbdump [options] [ pid | /path/to/ruby pid | /path/to/ruby core ]
     -d, --[no-]debug                 print debug log (default: false)
     -x, --gdbinit FILE               path to ruby repo's .gdbinit (default: some of ruby repo's .gdbinit is pre-bundle in this gem)
         --gdb PATH                   path to gdb command (default: gdb)
-        --ruby PATH                  path to ruby which the attached process uses (default: get from /proc/[PID]/exe)
 ```
 
 ### --gdbinit
@@ -35,9 +34,9 @@ Ruby repo's [.gdbinit](https://github.com/ruby/ruby/blob/trunk/.gdbinit) file de
 1. Download .gdbinit from ruby repo like [ruby/2.4.1/.gdbinit](https://github.com/ruby/ruby/blob/v2_4_1/.gdbinit), and specify with `-x` option
 2. Or, send PR to bundle the .gdbinit in `gdbdump` gem.
 
-## Example
+## Example (live ruby process)
 
-With living ruby 2.4.1 process of pid 1897,
+With live ruby process of pid 1897,
 
 ```
 $ gdbdump 1897
@@ -62,6 +61,20 @@ loop.rb:13:in `block (2 levels) in <main>'
 loop.rb:11:in `block in <main>'
 ```
 
+## Example (core file)
+
+With core file, you have to specify path of ruby executable.
+
+```
+$ gdbdump $HOME/.rbenv/versions/2.4.1/bin/ruby core.1897
+```
+
+You can get a core file with `gcore` command as:
+
+```
+$ sudo gcore 1897
+```
+
 ## FAQ
 
 * Q. How this work?
@@ -80,7 +93,8 @@ loop.rb:11:in `block in <main>'
 * [gdbruby](https://github.com/gunyarakun/gdbruby)
   * gdbruby enables to print C level and ruby level backtrace of living ruby process and core file.
   * gdbruby **must follow changes of C level interfaces of CRuby** to get backtrace of the core file, it rises fragility that it will be broken on newer ruby versions.
-  * gdbruby stops the process during printing backtrace as gdbdump, but it supports also core file. Using `gcore` command to get core file, it would be possible to analyze without stopping the process.
+  * gdbruby supports only ruby 2.0 and 2.1 (2017-06-05).
+  * I believe `gdbdump` can replace `gdbruby`.
 
 ## Development
 
