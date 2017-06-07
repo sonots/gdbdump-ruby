@@ -9,13 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Naotoshi Seo"]
   spec.email         = ["sonots@gmail.com"]
 
-<<<<<<< HEAD
-  spec.summary       = %q{Dump C level and Ruby level backtrace of living process using gdb.}
-  spec.description   = %q{Dump C level and Ruby level backtrace of living process using gdb.}
-=======
   spec.summary       = %q{Dump C level and Ruby level backtrace from living process or core file using gdb.}
   spec.description   = %q{Dump C level and Ruby level backtrace from living process or core file using gdb.}
->>>>>>> rb_ps works for core file, too
   spec.homepage      = "https://github.com/sonots/gdbdump-ruby"
   spec.license       = "MIT"
 

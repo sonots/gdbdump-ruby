@@ -1,3 +1,9 @@
+# 0.9.4
+
+Enhancements:
+
+* Support core file
+
 # 0.9.3
 
 Enhancements:
