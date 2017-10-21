@@ -112,6 +112,7 @@ CRuby itself has [rb_print_backtrace](https://github.com/ruby/ruby/blob/26864584
 I first tried to use them.
 
 However, they print a backtrace of only current thread. Furthermore, rb_print_backtrace supports printing outputs to only STDERR.
+Also, because it calls C function, it works only for a living process, and does not work for *core* file.
 
 ```ruby
 def print_backtrace
@@ -158,6 +159,8 @@ However, the debugee (target) process got stuck after `call rb_eval_string`. It 
 I thirdly tried to use `rb_ps` function defined in [.gdbinit](https://github.com/ruby/ruby/blob/44396dbe123511678710cfb21223c954b9ceaafb/.gdbinit#L983) of ruby repository to print C level and Ruby level backtrace of all threads.
 
 Since `.gdbinit` is maintained by ruby core team, I do not need to follow changes of C level interfaces of CRuby as long as I follow `.gdbinit`.
+
+Because `rb_ps` does not call any C functions inside, it can print C and Ruby level backtrace for *core* file.
 
 The drawback of this way is that
 
