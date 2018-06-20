@@ -9,7 +9,8 @@ class Gdbdump
     COMMAND_READ_BUFFER_SIZE = 1024
     SUDO_CMD = 'sudo'
 
-    def initialize(ruby: nil, pid_or_core:, debug: false, gdbinit: nil, gdb: nil)
+    def initialize(ruby: nil, pid_or_core: nil, debug: false, gdbinit: nil, gdb: nil)
+      raise 'pid_or_core is required' if pid_or_core.nil?
       if pid_or_core =~ /\A\d+\z/
         @pid  = pid_or_core.to_s
         @ruby = ruby || Procfs.new(@pid).exe
