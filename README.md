@@ -13,6 +13,7 @@ $ gem install gdbdump
 * gdb
 * linux
 * `sudo gdb` must be allowed to dump backtrace of living ruby process
+* ruby >= 2.0.0
 
 It was verified that gdbdump works with ruby executables built by [rbenv/ruby-build](https://github.com/rbenv/ruby-build).
 
@@ -27,7 +28,7 @@ Usage: gdbdump [options] [ pid | /path/to/ruby pid | /path/to/ruby core ]
 
 ### --gdbinit
 
-Default supported ruby versions: 2.1.x - 2.4.x
+Default supported ruby versions: 2.0.0 - 2.4.x
 
 Ruby repo's [.gdbinit](https://github.com/ruby/ruby/blob/trunk/.gdbinit) file defines useful helper functions and it is maintained by ruby core team. `gdbdump` uses it. `.gdbinit` of some versions written on above are pre-bundled in this gem. But, if you want to use `gdbdump` for older or newer ruby versions:
 
